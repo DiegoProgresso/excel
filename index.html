@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador Financeiro | Frutaria</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><span class="brand-icon">🍓</span><span>Fruta<span style="color:#60a5fa">Fin</span></span></div>
+  <nav class="nav" aria-label="Navegação principal">
+    <button class="active" data-view="dashboard">▦ <span>Painel financeiro</span></button>
+    <button data-view="compras">＋ <span>Registrar compra</span></button>
+    <button data-view="historico">▤ <span>Histórico e relatórios</span></button>
+    <button data-view="clientes">♙ <span>Clientes</span></button>
+    <button data-view="produtos">▧ <span>Produtos e estoque</span></button>
+  </nav>
+  <div class="sidebar-note">Simulador demonstrativo<br>Seus dados ficam salvos neste navegador.</div>
+</aside>
+<main class="main">
+<header class="topbar">
+  <div><div class="eyebrow">Gestão simples de vendas</div><h1 id="page-title">Painel financeiro</h1><p>Acompanhe vendas, pagamentos, clientes e estoque.</p></div>
+  <span class="tag">● Sistema local ativo</span>
+</header>
+
+<section class="view active" id="view-dashboard">
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Faturamento total</div><div class="stat-value" id="stat-total">R$ 0,00</div><div class="stat-foot">Compras não canceladas</div></div>
+    <div class="stat"><div class="stat-label">Total recebido</div><div class="stat-value" id="stat-paid">R$ 0,00</div><div class="stat-foot">Compras marcadas como pagas</div></div>
+    <div class="stat"><div class="stat-label">A receber</div><div class="stat-value" id="stat-pending">R$ 0,00</div><div class="stat-foot">Pagamentos pendentes</div></div>
+    <div class="stat"><div class="stat-label">Compras registradas</div><div class="stat-value" id="stat-count">0</div><div class="stat-foot" id="stat-clients">5 clientes cadastrados</div></div>
+  </div>
+  <div class="grid-2">
+    <div class="panel"><div class="panel-head"><div><h2>Vendas por produto</h2><div class="panel-sub">Valor vendido por produto</div></div></div><div id="sales-bars" class="bar-list"></div></div>
+    <div class="panel"><div class="panel-head"><div><h2>Resumo de pagamentos</h2><div class="panel-sub">Situação financeira das vendas</div></div></div><div id="payment-summary"></div><button class="secondary" onclick="showView('historico')">Ver relatório completo →</button></div>
+  </div>
+  <div class="panel"><div class="panel-head"><div><h2>Compras recentes</h2><div class="panel-sub">Últimas movimentações cadastradas</div></div><button class="secondary" onclick="showView('compras')">＋ Nova compra</button></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Data</th><th>Cliente</th><th>Itens</th><th>Total</th><th>Pagamento</th></tr></thead><tbody id="recent-table"></tbody></table></div></div>
+</section>
+
+<section class="view" id="view-compras">
+  <div class="grid-2">
+    <div class="panel"><div class="panel-head"><div><h2>Registrar nova compra</h2><div class="panel-sub">Selecione o cliente, produto e quantidade.</div></div></div>
+      <form id="purchase-form">
+        <div class="form-grid">
+          <div class="field full"><label for="buy-client">Cliente *</label><select id="buy-client" required></select></div>
+          <div class="field full"><label for="buy-product">Produto *</label><select id="buy-product" required></select></div>
+          <div class="field"><label for="buy-qty">Quantidade *</label><input id="buy-qty" type="number" min="1" step="1" value="1" required></div>
+          <div class="field"><label for="buy-date">Data da compra *</label><input id="buy-date" type="date" required></div>
+          <div class="field"><label for="buy-payment">Situação do pagamento *</label><select id="buy-payment"><option value="Pendente">Pendente</option><option value="Pago">Pago</option></select></div>
+          <div class="field"><label for="buy-stock">Estoque disponível</label><input id="buy-stock" readonly></div>
+          <div class="field full"><label for="buy-notes">Observações (opcional)</label><input id="buy-notes" maxlength="160" placeholder="Ex.: entrega ou detalhe da compra"></div>
+          <div class="field full"><button class="primary" type="submit">Registrar compra</button></div>
+        </div>
+      </form>
+    </div>
+    <div class="panel"><div class="panel-head"><div><h2>Resumo da compra</h2><div class="panel-sub">O valor é calculado automaticamente.</div></div></div>
+      <div class="summary-box"><div class="summary-row"><span>Produto</span><strong id="sum-product">Morango</strong></div><div class="summary-row"><span>Preço unitário</span><strong id="sum-price">R$ 10,00</strong></div><div class="summary-row"><span>Quantidade</span><strong id="sum-qty">1</strong></div><div class="summary-row total"><span>Total</span><strong id="sum-total">R$ 10,00</strong></div></div>
+      <div class="notice" style="margin-top:15px">O estoque será reduzido ao registrar a compra. Se uma compra for excluída, o estoque será devolvido. Compras canceladas não entram no faturamento.</div>
+      <h2 style="font-size:15px;margin:20px 0 10px">Como funciona</h2><p class="panel-sub" style="line-height:1.7">1. Escolha o cliente e o produto.<br>2. Informe uma quantidade inteira positiva.<br>3. Defina se o pagamento já foi realizado.<br>4. Confirme para atualizar o histórico, o financeiro e o estoque.</p>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="view-historico">
+  <div class="panel"><div class="panel-head"><div><h2>Histórico e relatórios</h2><div class="panel-sub">Filtre compras, consulte clientes e altere o estado do pagamento.</div></div><button class="secondary" onclick="exportCSV()">Exportar CSV</button></div>
+    <div class="filters">
+      <select id="filter-client" aria-label="Filtrar por cliente"><option value="">Todos os clientes</option></select>
+      <select id="filter-product" aria-label="Filtrar por produto"><option value="">Todos os produtos</option></select>
+      <select id="filter-payment" aria-label="Filtrar por pagamento"><option value="">Todos os pagamentos</option><option>Pago</option><option>Pendente</option><option>Cancelado</option></select>
+      <input id="filter-from" type="date" aria-label="Data inicial">
+      <input id="filter-to" type="date" aria-label="Data final">
+      <button class="muted-btn" onclick="clearFilters()">Limpar filtros</button>
+    </div>
+    <div class="stats" style="margin-bottom:15px">
+      <div class="stat"><div class="stat-label">Total filtrado</div><div class="stat-value" id="filter-total">R$ 0,00</div></div>
+      <div class="stat"><div class="stat-label">Recebido (filtro)</div><div class="stat-value" id="filter-paid">R$ 0,00</div></div>
+      <div class="stat"><div class="stat-label">Pendente (filtro)</div><div class="stat-value" id="filter-pending">R$ 0,00</div></div>
+      <div class="stat"><div class="stat-label">Registros encontrados</div><div class="stat-value" id="filter-count">0</div></div>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>ID</th><th>Data</th><th>Cliente</th><th>Produto</th><th>Qtd.</th><th>Unitário</th><th>Total</th><th>Pagamento</th><th>Ações</th></tr></thead><tbody id="history-table"></tbody></table></div>
+  </div>
+  <div class="panel"><div class="panel-head"><div><h2>Histórico por cliente</h2><div class="panel-sub">Resumo dos gastos, recebimentos e valores pendentes.</div></div></div><div class="table-wrap"><table><thead><tr><th>Cliente</th><th>Nº de compras</th><th>Total comprado</th><th>Pago</th><th>Pendente</th></tr></thead><tbody id="client-summary"></tbody></table></div></div>
+</section>
+
+<section class="view" id="view-clientes">
+  <div class="panel"><div class="panel-head"><div><h2>Clientes cadastrados</h2><div class="panel-sub">Lista inicial fornecida para o simulador.</div></div></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Nome</th><th>Telefone</th><th>Compras</th><th>Total comprado</th><th>Pendente</th><th>Ação</th></tr></thead><tbody id="clients-table"></tbody></table></div></div>
+</section>
+
+<section class="view" id="view-produtos">
+  <div class="panel"><div class="panel-head"><div><h2>Produtos e controle de estoque</h2><div class="panel-sub">Preços iniciais fornecidos. Edite o estoque de cada produto.</div></div></div>
+    <div class="notice">O estoque inicial foi definido como 20 unidades por produto apenas para demonstração. Você pode ajustar esse valor abaixo.</div>
+    <div class="product-grid" id="product-cards"></div>
+  </div>
+  <div class="panel"><div class="panel-head"><div><h2>Tabela de produtos</h2><div class="panel-sub">Preço atual e quantidade disponível.</div></div></div><div class="table-wrap"><table><thead><tr><th>ID</th><th>Produto</th><th>Preço unitário</th><th>Estoque atual</th><th>Valor em estoque</th></tr></thead><tbody id="products-table"></tbody></table></div></div>
+</section>
+<div class="footer">FrutaFin · Simulador financeiro demonstrativo · Dados armazenados localmente no navegador</div>
+</main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="script.js"></script>
+</body>
+</html>
